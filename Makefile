@@ -2,7 +2,7 @@
 # Université Pierre et Marie Curie
 # Antoine Miné 2015
 
-# Makefile
+# file
 
 
 # points to compilers
@@ -77,6 +77,7 @@ MLFILES = \
   domains/value_domain.ml \
   domains/concrete_domain.ml \
   domains/constant_domain.ml \
+  domains/interval_domain.ml \
   domains/non_relational_domain.ml \
   interpreter/interpreter.ml \
   main.ml

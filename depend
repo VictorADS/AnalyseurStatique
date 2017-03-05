@@ -28,6 +28,10 @@ domains/constant_domain.cmo : domains/value_domain.cmx \
     frontend/abstract_syntax_tree.cmx
 domains/constant_domain.cmx : domains/value_domain.cmx \
     frontend/abstract_syntax_tree.cmx
+domains/interval_domain.cmo : domains/value_domain.cmx \
+    frontend/abstract_syntax_tree.cmx
+domains/interval_domain.cmx : domains/value_domain.cmx \
+    frontend/abstract_syntax_tree.cmx
 domains/non_relational_domain.cmo : domains/value_domain.cmx libs/mapext.cmi \
     domains/domain.cmx frontend/abstract_syntax_tree.cmx
 domains/non_relational_domain.cmx : domains/value_domain.cmx libs/mapext.cmx \
@@ -36,12 +40,14 @@ interpreter/interpreter.cmo : domains/domain.cmx \
     frontend/abstract_syntax_tree.cmx frontend/abstract_syntax_printer.cmi
 interpreter/interpreter.cmx : domains/domain.cmx \
     frontend/abstract_syntax_tree.cmx frontend/abstract_syntax_printer.cmx
-main.cmo : domains/non_relational_domain.cmx interpreter/interpreter.cmx \
-    frontend/file_parser.cmi domains/constant_domain.cmx \
-    domains/concrete_domain.cmx frontend/abstract_syntax_printer.cmi
-main.cmx : domains/non_relational_domain.cmx interpreter/interpreter.cmx \
-    frontend/file_parser.cmx domains/constant_domain.cmx \
-    domains/concrete_domain.cmx frontend/abstract_syntax_printer.cmx
+main.cmo : domains/non_relational_domain.cmx domains/interval_domain.cmx \
+    interpreter/interpreter.cmx frontend/file_parser.cmi \
+    domains/constant_domain.cmx domains/concrete_domain.cmx \
+    frontend/abstract_syntax_printer.cmi
+main.cmx : domains/non_relational_domain.cmx domains/interval_domain.cmx \
+    interpreter/interpreter.cmx frontend/file_parser.cmx \
+    domains/constant_domain.cmx domains/concrete_domain.cmx \
+    frontend/abstract_syntax_printer.cmx
 libs/mapext.cmi :
 frontend/parser.cmi : frontend/abstract_syntax_tree.cmx
 frontend/abstract_syntax_printer.cmi : frontend/abstract_syntax_tree.cmx
