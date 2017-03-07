@@ -207,9 +207,11 @@ module Intervals = (struct
                 intersection, intersection
 
 
-  let neq a b =
-    a, b
-      
+  let neq a b = match a,b with
+        | BOT, x | x, BOT -> 
+        | INTERVALLE(NEG_INF, POS_INF), x | x, INTERVALLE(NEG_INF, POS_INF) -> BOT, BOT
+        | _ -> let intersection = meet a b in
+                intersection, intersection
   let geq a b =
     a, b
       
