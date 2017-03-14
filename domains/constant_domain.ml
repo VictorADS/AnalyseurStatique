@@ -74,7 +74,9 @@ module Constants = (struct
 
   let sub = lift2 Z.sub
 
-  let mul = lift2 Z.mul
+  let mul a b =
+        if a = Cst Z.zero || b = Cst Z.zero then Cst Z.zero
+        else lift2 Z.mul a b
 
   let div a b =
     if b = Cst Z.zero then BOT
@@ -100,18 +102,37 @@ module Constants = (struct
 
   (* comparison operations (filters) *)
 
-  let eq a b =
-    (* this is not very precise, how can we improve it ? *)
-    a, b
+let eq a b =
+        match a,b with
+        | Cst x, Cst y ->
+                if x = y then Cst x, Cst y else BOT, BOT
+        | Cst x, TOP | TOP, Cst x -> Cst x, Cst x
+        | BOT, _ | _, BOT -> BOT, BOT
+        | _ -> a, b
 
-  let neq a b =
-    a, b
-      
+
+let neq a b =
+        match a, b with
+        | Cst x, Cst y ->
+                if x = y then BOT, BOT else Cst x, Cst y
+        | _, TOP | TOP, _ -> a, b
+        | Cst x, BOT | BOT, Cst x -> a, b
+        | _ -> a, b
+
   let geq a b =
-    a, b
-      
+    match a, b with
+        | Cst x, Cst y ->
+                if y < x then Cst x, Cst y else BOT, BOT
+        | _, BOT | BOT, _ -> BOT, BOT
+        | _ -> a, b
+
   let gt a b =
-    a, b
+    match a, b with
+        | Cst x, Cst y ->
+                if x > y then Cst x, Cst y else BOT, BOT
+        | _, BOT | BOT, _ -> BOT, BOT
+        | _ -> a, b
+
 
 
   (* subset inclusion of concretizations *)
