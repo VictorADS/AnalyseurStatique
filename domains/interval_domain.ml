@@ -207,11 +207,42 @@ module Intervals = (struct
                 intersection, intersection
 
 
-  let neq a b = match a,b with
-        | BOT, x | x, BOT -> 
+  let neq interA interB = match interA,interB with
+        | BOT, x | x, BOT -> interA, interB
         | INTERVALLE(NEG_INF, POS_INF), x | x, INTERVALLE(NEG_INF, POS_INF) -> BOT, BOT
-        | _ -> let intersection = meet a b in
-                intersection, intersection
+       | INTERVALLE(a, b), INTERVALLE(c, d) ->
+        (* Premier intervalle est une constante *)
+        if a = b then
+                (* Si l'autre intervalle est une constante également *)
+                if c = d then
+                        (* On compare les deux constantes *)
+                        if a = c then
+                                BOT, BOT
+                        else
+                                interA, interB
+                (* Si la constante est l'une des deux bornes de l'autre intervalle *)
+                else if a = c then
+                        interA, INTERVALLE((add_born c (Cst Z.one)), d)
+                else if a = d then
+                        interA, INTERVALLE(c, (sub_born d (Cst Z.one)))
+                else
+                        (*TODO peut etre BOT, BOT *)
+                        interA, interB
+        (* Deuxième intervalle est une constante *)
+        else if c = d then
+                if c = a then
+			begin
+			print_string "Yolo\n";
+                        INTERVALLE((add_born a (Cst Z.one)), b), interB
+			end
+                else if c = b then
+                        INTERVALLE(a, (sub_born b (Cst Z.one))), interB
+                else
+                        interA, interB
+        (* Si deux intervalles, on ne peut pas les filtrer *)
+        else
+                interA, interB
+
   let geq a b =
     a, b
       
