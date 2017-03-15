@@ -239,12 +239,51 @@ module Intervals = (struct
                         INTERVALLE(a, (sub_born b (Cst Z.one))), interB
                 else
                         interA, interB
-        (* Si deux intervalles, on ne peut pas les filtrer *)
+        (* Si deux intervalles regarde sil ya une intersection sinon pas filtrable *)
         else
-                interA, interB
+                if (a = c && b = d) then (* Meme intervalle *)
+			BOT, BOT
+		else if (lower_than a c && lower_than b d && greater_than b c) then (* Cas croisement entre c,b *)
+			INTERVALLE(a, (sub_born c (Cst Z.one))), INTERVALLE((add_born b (Cst Z.one)), d)
+		else if (lower_than c a && lower_than d b && greater_than d a) then (* Cas croisement entre a,d *)
+			INTERVALLE((add_born d (Cst Z.one)), b), INTERVALLE(c, (sub_born a (Cst Z.one)))
+		else
+			interA, interB
 
-  let geq a b =
-    a, b
+
+  let geq interA interB =
+        match interA, interB with
+        | BOT, _ | _, BOT
+        | INTERVALLE(NEG_INF, POS_INF), INTERVALLE(NEG_INF, POS_INF) -> interA, interB
+        | INTERVALLE(NEG_INF, POS_INF), INTERVALLE(a, b) -> INTERVALLE(a, POS_INF), INTERVALLE(a, b)
+        | INTERVALLE(a, b), INTERVALLE(NEG_INF, POS_INF) -> INTERVALLE(a, b), INTERVALLE(NEG_INF, b)
+        | INTERVALLE(a, b), INTERVALLE(c, d) ->
+                if c <= a then
+                        if d <= a then
+                                begin
+                                        interA, interB
+                                end
+                        else if d <= b then(* TODO renvoyer le partie sup ? *)
+                                begin
+                                        interA, interB
+                                end
+                        else		(* a,b est contenu dans c,d *)
+                                begin 
+                                        interA, interA
+                                end
+                else if c <= b then (* c > a && c < b *)
+                        if d <= b then (* c,d contenu dans a,b *)
+                                begin
+                                        INTERVALLE(c, b), interB
+                                end
+                        else        
+                                begin
+                                        INTERVALLE(c, b), INTERVALLE(c, b)
+                                end
+                else (* c et d > b *)
+                        begin
+                                BOT, BOT
+                        end
       
   let gt a b =
     a, b
