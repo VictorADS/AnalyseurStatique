@@ -84,10 +84,15 @@ module Parity = (struct
 	| BOT, x | x, BOT -> BOT
 	| TOP, x | x, TOP -> TOP
 	| PAIR, PAIR -> PAIR
-	| IMPAIR, IMPAIR -> PAIR
-	| PAIR, IMPAIR | IMPAIR, PAIR -> IMPAIR
+	| IMPAIR, IMPAIR -> IMPAIR
+	| PAIR, IMPAIR | IMPAIR, PAIR -> PAIR
 
-  let div x y = x
+  let div x y = match x,y with 
+	| BOT, x | x, BOT -> BOT
+	| TOP, x | x, TOP -> TOP
+	| PAIR, PAIR -> PAIR
+	| IMPAIR, IMPAIR -> TOP
+	| PAIR, IMPAIR | IMPAIR, PAIR -> TOP
 
 
   (* set-theoretic operations *)
