@@ -24,10 +24,10 @@ open Domain
 let trace = ref false
 
 (* widening delay *)
-let widen_delay = ref 3
+let widen_delay = ref (-1)
 
 (* loop unrolling *)
-let loop_unrolling = ref 3
+let loop_unrolling = ref (-1)
 
 
 
@@ -154,21 +154,35 @@ module Interprete(D : DOMAIN) =
         D.join t f
           
     | AST_while (e,s) ->
-        (* simple fixpoint *)
-        let rec fix (f:t -> t) (x:t) : t = 
-          let fx = f x in
-          if D.subset fx x then fx
-          else fix f fx
-        in
-        (* function to accumulate one more loop iteration:
+           (* unroll *)
+           let rec unroll (v:t) (c:int) : t =
+             if (c = (!loop_unrolling)) then v
+             else unroll (eval_stat (filter v e true) s) (c+1) in (* Deroule les loop_unroling premier tour de boucle *)
+           
+           (* fixpoint *)
+           let rec fixDelay delay (f:t -> t) (x:t) : t =
+             let fx = if !widen_delay >= 0 && delay < !widen_delay then f x else D.widen x (f x) in
+             if D.subset fx x then fx
+             else fixDelay (delay+1) f fx
+           in
+           
+           (* function to accumulate one more loop iteration:
            F(X(n+1)) = X(0) U body(F(X(n)
            we apply the loop body and add back the initial abstract state
-         *)        
-        let f x = D.join a (eval_stat (filter x e true) s) in
-        (* compute fixpoint from the initial state (i.e., a loop invariant) *)
-        let inv = fix f a in
-        (* and then filter by exit condition *)
-        filter inv e false
+            *)        
+           (*let f x = D.join a (eval_stat (filter x e true) s) in*)
+           let f2 a_unroll x = D.join a_unroll (eval_stat (filter x e true) s) in
+           
+     
+                              
+           (* compute fixpoint from the initial state (i.e., a loop invariant) *)
+           let a_unroll =  if !loop_unrolling >= 0  then unroll a 0 else a in
+           let inv = fixDelay 0 (if !loop_unrolling >= 0 then f2 a_unroll else f2 a) a_unroll in (* avant fix a la place de funcFix *)
+           
+           Format.printf "UNROLL : %a@\n" D.print_all a_unroll; 
+           (* and then filter by exit condition *)
+           Format.printf "Invariant : %a@\n" D.print_all inv; 
+           filter inv e false
 
     | AST_assert e ->
         (* not implemented *)

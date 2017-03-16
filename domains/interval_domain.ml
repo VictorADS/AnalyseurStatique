@@ -32,6 +32,26 @@ module Intervals = (struct
 
   (* utilities *)
 
+let geq_bornes borneA borneB =
+        match borneA, borneB with
+        | POS_INF, POS_INF -> true
+        | NEG_INF, NEG_INF -> true
+        | _, POS_INF -> false
+        | NEG_INF, _ -> false
+        | POS_INF, _ -> true
+        | _, NEG_INF -> true
+        | Cst x, Cst y -> x >= y
+
+let leq_bornes borneA borneB =
+        match borneA, borneB with
+        | POS_INF, POS_INF -> true
+        | NEG_INF, NEG_INF -> true
+        | _, POS_INF -> true
+        | NEG_INF, _ -> true
+        | POS_INF, _ -> false
+        | _, NEG_INF -> false
+        | Cst x, Cst y -> y >= x
+
   let greater_than a b = match a,b with
 	| NEG_INF, x | x, POS_INF -> false
 	| x, NEG_INF | POS_INF, x -> true
@@ -195,8 +215,13 @@ module Intervals = (struct
 
 
   (* no need for a widening as the domain has finite height; we use the join *)
-  let widen = join
-
+  let widen a b = match a,b with
+  | BOT,x | x,BOT -> BOT
+  | INTERVALLE(NEG_INF, POS_INF),x | x,INTERVALLE(NEG_INF, POS_INF) ->  INTERVALLE(NEG_INF, POS_INF)
+  | INTERVALLE(a, b), INTERVALLE(c, d) ->
+                let lower_bound = if lower_than c a then NEG_INF else a in
+                let upper_bound = if greater_than d  b then POS_INF else b in
+                        INTERVALLE(lower_bound, upper_bound)
 
   (* comparison operations (filters) *)
 
@@ -285,15 +310,49 @@ module Intervals = (struct
                                 BOT, BOT
                         end
       
-  let gt a b =
-    a, b
+  let gt interA interB =
+        match interA, interB with
+        | BOT, _ -> BOT, BOT
+        | INTERVALLE(NEG_INF, POS_INF), BOT -> interA, interB
+        | INTERVALLE(NEG_INF, POS_INF), INTERVALLE(NEG_INF, POS_INF) -> interA, interB
+        | _, BOT -> interA, interB
+        | INTERVALLE(NEG_INF, POS_INF), INTERVALLE(a, b) -> INTERVALLE((add_born b (Cst Z.one)), POS_INF), INTERVALLE(a, b)
+        | INTERVALLE(a, b), INTERVALLE(NEG_INF, POS_INF) -> INTERVALLE(a, b), INTERVALLE(NEG_INF, (sub_born a (Cst Z.one)))
+        | INTERVALLE(a, b), INTERVALLE(c, d) ->
+
+        (* Tout le premier intervalle est inférieur au deuxieme *)
+        if lower_than b c then
+                BOT, BOT
+        else if greater_than a d then
+                begin
+                interA, interB
+                end
+        else
+                (* c entre a et b *)
+                if geq_bornes c a && greater_than b  c then
+                        if c = d then
+                                begin
+                                INTERVALLE((add_born c (Cst Z.one)), b), INTERVALLE(c, c)
+                                end
+                        else
+                                begin
+                                INTERVALLE((add_born c (Cst Z.one)), b), INTERVALLE(c, (sub_born b (Cst Z.one)))
+                                end
+                else
+                        if b = d then
+                                BOT, BOT
+                        else
+                                begin
+                                interA, INTERVALLE(c, max c (sub_born b (Cst Z.one)) )
+                                end
+
 
 
   (* subset inclusion of concretizations *)
   let subset a b = match a,b with
   | BOT,_ | _, INTERVALLE(NEG_INF, POS_INF) -> true
   | INTERVALLE(a, b), INTERVALLE(c, d) ->
-	greater_than a c && lower_than b d
+	geq_bornes a c && leq_bornes b d
 		
   | _ -> false
 
