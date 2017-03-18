@@ -90,38 +90,64 @@ module Parity = (struct
   let div x y = match x,y with 
 	| BOT, x | x, BOT -> BOT
 	| TOP, x | x, TOP -> TOP
-	| PAIR, PAIR -> PAIR
-	| IMPAIR, IMPAIR -> TOP
+	| PAIR, PAIR -> TOP
+	| IMPAIR, IMPAIR -> IMPAIR
 	| PAIR, IMPAIR | IMPAIR, PAIR -> TOP
 
 
   (* set-theoretic operations *)
 
   (* union *)
-  let join a b = a
+  let join a b = match a,b with
+	| BOT, x | x, BOT -> x
+	| PAIR,PAIR -> PAIR
+	| IMPAIR, IMPAIR -> IMPAIR
+	| _ -> TOP
 
   (* intersec *)
-  let meet a b = a
-
+  let meet a b = match a,b with
+	| BOT, x | x, BOT -> BOT
+	| TOP, x | x, TOP -> x
+	| PAIR,PAIR -> PAIR
+	| IMPAIR, IMPAIR -> IMPAIR
+	| _ -> BOT
 
   (* no need for a widening as the domain has finite height; we use the join *)
-  let widen a b = a
+  let widen = join
 
   (* comparison operations (filters) *)
 
-  let eq a b = a,b
+  let eq a b = match a,b with
+| TOP, x | x, TOP -> x, x
+| BOT, x | x, BOT -> BOT, BOT
+| _ -> a,b
 
-  let neq interA interB = interA,interB
+  let neq a b =
+        match a, b with
+        | x, y ->
+                if x = y then BOT, BOT else x, y
+        | _, TOP | TOP, _ -> a, b
+        | x, BOT | BOT, x -> a, b
 
+  let geq a b =
+    match a, b with
+        | _, BOT | BOT, _ -> a, b
+	| TOP, x | x, TOP -> BOT, BOT
+        | _ -> a, b
 
-  let geq interA interB = interA, interB
-      
-  let gt interA interB = interA, interB
+  let gt a b =
+    match a, b with
+        | _, BOT | BOT, _ -> a, b
+	| TOP, x | x, TOP -> BOT, BOT
+        | _ -> a, b
 
 
 
   (* subset inclusion of concretizations *)
-  let subset a b = true
+  let subset a b = match a,b with
+  | BOT,_ | _,TOP -> true
+  | x, y -> x=y
+  | _ -> false
 
   (* check the emptyness of the concretization *)
   let is_bottom a =
@@ -173,9 +199,8 @@ module Parity = (struct
         
   | AST_MULTIPLY ->
       (* r=x*y => (x=r/y or y=r=0) and (y=r/x or x=r=0)  *)
-      let contains_zero o = subset Z.zero o in
-      (if contains_zero y && contains_zero r then x else meet x (div r y)),
-      (if contains_zero x && contains_zero r then y else meet y (div r x))
+	(meet x (div r y)),
+        (meet y (div r x))
         
   | AST_DIVIDE ->
       (* this is sound, but not precise *)
