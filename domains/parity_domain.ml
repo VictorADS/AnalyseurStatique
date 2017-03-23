@@ -91,7 +91,7 @@ module Parity = (struct
 	| BOT, x | x, BOT -> BOT
 	| TOP, x | x, TOP -> TOP
 	| PAIR, PAIR -> TOP
-	| IMPAIR, IMPAIR -> IMPAIR
+	| IMPAIR, IMPAIR -> TOP
 	| PAIR, IMPAIR | IMPAIR, PAIR -> TOP
 
 
@@ -120,18 +120,17 @@ module Parity = (struct
   let eq a b = match a,b with
 | TOP, x | x, TOP -> x, x
 | BOT, x | x, BOT -> BOT, BOT
-| _ -> a,b
+| PAIR, PAIR -> PAIR, PAIR
+| IMPAIR, IMPAIR -> IMPAIR, IMPAIR
+| _ -> BOT, BOT
 
   let neq a b =
         match a, b with
         | x, y ->
                 if x = y then BOT, BOT else x, y
-        | _, TOP | TOP, _ -> a, b
-        | x, BOT | BOT, x -> a, b
 
   let geq a b =
     match a, b with
-        | _, BOT | BOT, _ -> a, b
 	| TOP, x | x, TOP -> BOT, BOT
         | _ -> a, b
 
@@ -147,7 +146,6 @@ module Parity = (struct
   let subset a b = match a,b with
   | BOT,_ | _,TOP -> true
   | x, y -> x=y
-  | _ -> false
 
   (* check the emptyness of the concretization *)
   let is_bottom a =
@@ -159,7 +157,6 @@ module Parity = (struct
   | TOP -> Format.fprintf fmt "Top"
   | PAIR -> Format.fprintf fmt "Pair"
   | IMPAIR -> Format.fprintf fmt "Impair"
-  | _ -> invalid_arg "We should not be here"
 (* operator dispatch *)
         
   let unary x op = match op with
@@ -180,7 +177,11 @@ module Parity = (struct
   | AST_LESS_EQUAL    -> let y',x' = geq y x in x',y'
   | AST_LESS          -> let y',x' = gt y x in x',y'
         
+  let is_pair x = 
+	x = PAIR
 
+  let left_born a = invalid_arg "left born parity"
+  let right_born a = invalid_arg "right born parity"
 
   let bwd_unary x op r = match op with
   | AST_UNARY_PLUS  -> meet x r

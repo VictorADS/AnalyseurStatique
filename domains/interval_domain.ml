@@ -288,7 +288,7 @@ let leq_bornes borneA borneB =
                                 begin
                                         interA, interB
                                 end
-                        else if d <= b then(* TODO renvoyer le partie sup ? *)
+                        else if d <= b then
                                 begin
                                         interA, interB
                                 end
@@ -359,6 +359,16 @@ let leq_bornes borneA borneB =
   (* check the emptyness of the concretization *)
   let is_bottom a =
     a=BOT
+
+  let left_born x = match x  with
+	| INTERVALLE(Cst a, Cst b) -> a
+	| _ -> invalid_arg "left born is not a cst"
+
+  let right_born x = match x  with
+	| INTERVALLE(Cst a, Cst b) -> b
+	| _ -> invalid_arg "right born is not a cst"
+  
+ let is_pair a = invalid_arg "intervalle pair"
 
   (* prints abstract element *)
   let print fmt x = match x with

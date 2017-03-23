@@ -20,6 +20,12 @@ domains/domain.cmo : frontend/abstract_syntax_tree.cmx
 domains/domain.cmx : frontend/abstract_syntax_tree.cmx
 domains/value_domain.cmo : frontend/abstract_syntax_tree.cmx
 domains/value_domain.cmx : frontend/abstract_syntax_tree.cmx
+domains/value_reduction.cmo : domains/value_domain.cmx
+domains/value_reduction.cmx : domains/value_domain.cmx
+domains/value_reduced_product.cmo : domains/value_reduction.cmx \
+    domains/value_domain.cmx frontend/abstract_syntax_tree.cmx
+domains/value_reduced_product.cmx : domains/value_reduction.cmx \
+    domains/value_domain.cmx frontend/abstract_syntax_tree.cmx
 domains/concrete_domain.cmo : domains/value_domain.cmx libs/mapext.cmi \
     domains/domain.cmx frontend/abstract_syntax_tree.cmx
 domains/concrete_domain.cmx : domains/value_domain.cmx libs/mapext.cmx \
@@ -36,6 +42,10 @@ domains/parity_domain.cmo : domains/value_domain.cmx \
     frontend/abstract_syntax_tree.cmx
 domains/parity_domain.cmx : domains/value_domain.cmx \
     frontend/abstract_syntax_tree.cmx
+domains/parity_interval_reduction.cmo : domains/value_reduction.cmx \
+    domains/parity_domain.cmx domains/interval_domain.cmx
+domains/parity_interval_reduction.cmx : domains/value_reduction.cmx \
+    domains/parity_domain.cmx domains/interval_domain.cmx
 domains/non_relational_domain.cmo : domains/value_domain.cmx libs/mapext.cmi \
     domains/domain.cmx frontend/abstract_syntax_tree.cmx
 domains/non_relational_domain.cmx : domains/value_domain.cmx libs/mapext.cmx \
@@ -44,14 +54,18 @@ interpreter/interpreter.cmo : domains/domain.cmx \
     frontend/abstract_syntax_tree.cmx frontend/abstract_syntax_printer.cmi
 interpreter/interpreter.cmx : domains/domain.cmx \
     frontend/abstract_syntax_tree.cmx frontend/abstract_syntax_printer.cmx
-main.cmo : domains/parity_domain.cmx domains/non_relational_domain.cmx \
-    domains/interval_domain.cmx interpreter/interpreter.cmx \
-    frontend/file_parser.cmi domains/constant_domain.cmx \
-    domains/concrete_domain.cmx frontend/abstract_syntax_printer.cmi
-main.cmx : domains/parity_domain.cmx domains/non_relational_domain.cmx \
-    domains/interval_domain.cmx interpreter/interpreter.cmx \
-    frontend/file_parser.cmx domains/constant_domain.cmx \
-    domains/concrete_domain.cmx frontend/abstract_syntax_printer.cmx
+main.cmo : domains/value_reduced_product.cmx \
+    domains/parity_interval_reduction.cmx domains/parity_domain.cmx \
+    domains/non_relational_domain.cmx domains/interval_domain.cmx \
+    interpreter/interpreter.cmx frontend/file_parser.cmi \
+    domains/constant_domain.cmx domains/concrete_domain.cmx \
+    frontend/abstract_syntax_printer.cmi
+main.cmx : domains/value_reduced_product.cmx \
+    domains/parity_interval_reduction.cmx domains/parity_domain.cmx \
+    domains/non_relational_domain.cmx domains/interval_domain.cmx \
+    interpreter/interpreter.cmx frontend/file_parser.cmx \
+    domains/constant_domain.cmx domains/concrete_domain.cmx \
+    frontend/abstract_syntax_printer.cmx
 libs/mapext.cmi :
 frontend/parser.cmi : frontend/abstract_syntax_tree.cmx
 frontend/abstract_syntax_printer.cmi : frontend/abstract_syntax_tree.cmx

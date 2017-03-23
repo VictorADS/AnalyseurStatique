@@ -252,4 +252,8 @@ module NonRelational(V : VALUE_DOMAIN) = (struct
           m;
         Format.fprintf fmt " ]"
 
+  let is_pair a = invalid_arg "nonrelational pair"
+  let left_born a = invalid_arg "left born non realational"
+  let right_born a = invalid_arg "right born non relational"
+
 end : DOMAIN)

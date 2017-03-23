@@ -199,6 +199,9 @@ let neq a b =
       (* this is sound, but not precise *)
       x, y
         
+  let is_pair a = invalid_arg "constant pair"
+  let left_born a = invalid_arg "left born constant"
+  let right_born a = invalid_arg "right born constnat"
       
 end : VALUE_DOMAIN)
 

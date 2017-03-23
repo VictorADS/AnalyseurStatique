@@ -75,10 +75,13 @@ MLFILES = \
   frontend/file_parser.ml \
   domains/domain.ml \
   domains/value_domain.ml \
+  domains/value_reduction.ml \
+  domains/value_reduced_product.ml \
   domains/concrete_domain.ml \
   domains/constant_domain.ml \
   domains/interval_domain.ml \
   domains/parity_domain.ml \
+  domains/parity_interval_reduction.ml \
   domains/non_relational_domain.ml \
   interpreter/interpreter.ml \
   main.ml

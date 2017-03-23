@@ -97,6 +97,10 @@ module type VALUE_DOMAIN =
        let bwd_binay x y _ _ = (x,y)
       *)
     val bwd_binary: t -> t -> int_binary_op -> t -> (t * t)
+
+    val is_pair: t -> bool
+    val left_born: t -> Z.t
+    val right_born: t -> Z.t
   
 end
       

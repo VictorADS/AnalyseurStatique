@@ -227,6 +227,9 @@ module Concrete = (struct
       ) m;
     Format.fprintf fmt "}"
 
+  let is_pair a = invalid_arg "Concrete pair"
+  let left_born a = invalid_arg "left born concrete"
+  let right_born a = invalid_arg "right born concrete"
 
 end: DOMAIN)
     
