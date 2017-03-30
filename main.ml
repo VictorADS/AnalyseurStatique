@@ -51,8 +51,6 @@ let main () =
      "-constant", Arg.Unit (fun () -> action := ConstantAnalysis.eval_prog),"";
      "-interval", Arg.Unit (fun () -> action := IntervalAnalysis.eval_prog),"";
      "-parity", Arg.Unit (fun () -> action := ParityAnalysis.eval_prog),"";
-     "-delay",         Arg.Set_int (Interpreter.widen_delay),"";
-     "-unroll",        Arg.Set_int (Interpreter.loop_unrolling),"";
      "-product", Arg.Unit (fun () -> action := ReduceProductAnalysis.eval_prog),"";
    ]
     (* handle filenames *)
