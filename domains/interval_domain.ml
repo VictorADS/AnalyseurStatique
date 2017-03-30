@@ -193,6 +193,14 @@ let leq_bornes borneA borneB =
 				 max bc bd else max ac ad in
 			INTERVALLE(borne_inf,borne_sup)
 
+  let lift2 f (x:t) (y:t) :t =
+    match x,y with
+    | BOT,_ | _,BOT -> BOT
+    | INTERVALLE (a, b), INTERVALLE(c, d) -> f a b c d
+
+  let modulo (a:t) (b:t) : t = lift2 (fun  i j k l -> INTERVALLE(Cst Z.zero, add_born l (Cst Z.one))) a b
+
+
 
   (* set-theoretic operations *)
 
@@ -389,6 +397,8 @@ let leq_bornes borneA borneB =
   | AST_MINUS    -> sub x y
   | AST_MULTIPLY -> mul x y
   | AST_DIVIDE   -> div x y
+  | AST_MODULO   -> modulo x y
+
 
   let compare x y op = match op with
   | AST_EQUAL         -> eq x y
@@ -422,7 +432,10 @@ let leq_bornes borneA borneB =
       (if contains_zero x && contains_zero r then y else meet y (div r x))
         
   | AST_DIVIDE ->
-      (* this is sound, but not precise *)
+      (* r = x/y  => x=r*y and y=x/r*)
+      meet x (mul y r), meet y (div y r)
+
+  | AST_MODULO ->
       x, y
         
       

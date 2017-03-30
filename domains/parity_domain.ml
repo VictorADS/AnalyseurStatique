@@ -94,6 +94,11 @@ module Parity = (struct
 	| IMPAIR, IMPAIR -> TOP
 	| PAIR, IMPAIR | IMPAIR, PAIR -> TOP
 
+  let modulo x y = match x,y with
+	| BOT, x | x, BOT -> BOT
+	| TOP, x | x, TOP -> TOP
+	| PAIR, PAIR -> PAIR
+	| _ -> TOP
 
   (* set-theoretic operations *)
 
@@ -168,6 +173,7 @@ module Parity = (struct
   | AST_MINUS    -> sub x y
   | AST_MULTIPLY -> mul x y
   | AST_DIVIDE   -> div x y
+  | AST_MODULO   -> modulo x y
 
   let compare x y op = match op with
   | AST_EQUAL         -> eq x y
@@ -206,7 +212,8 @@ module Parity = (struct
   | AST_DIVIDE ->
       (* this is sound, but not precise *)
       x, y
-        
+  | AST_MODULO ->
+	x, y
       
 end : VALUE_DOMAIN)
 

@@ -14,6 +14,7 @@ type token =
   | TOK_PRINT
   | TOK_PLUS
   | TOK_NOT_EQUAL
+  | TOK_MODULO
   | TOK_MINUS
   | TOK_LPAREN
   | TOK_LESS_EQUAL

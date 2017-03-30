@@ -78,6 +78,8 @@ module Constants = (struct
         if a = Cst Z.zero || b = Cst Z.zero then Cst Z.zero
         else lift2 Z.mul a b
 
+  let modulo = lift2 Z.erem
+
   let div a b =
     if b = Cst Z.zero then BOT
     else lift2 Z.div a b
@@ -163,6 +165,8 @@ let neq a b =
   | AST_MINUS    -> sub x y
   | AST_MULTIPLY -> mul x y
   | AST_DIVIDE   -> div x y
+  | AST_MODULO   -> modulo x y
+
 
   let compare x y op = match op with
   | AST_EQUAL         -> eq x y
@@ -196,8 +200,12 @@ let neq a b =
       (if contains_zero x && contains_zero r then y else meet y (div r x))
         
   | AST_DIVIDE ->
-      (* this is sound, but not precise *)
+      meet x (mul y r), meet y (div y r)
+
+  | AST_MODULO   ->
       x, y
+
+
         
   let is_pair a = invalid_arg "constant pair"
   let left_born a = invalid_arg "left born constant"

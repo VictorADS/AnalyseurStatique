@@ -95,6 +95,8 @@ module Concrete = (struct
           | AST_MINUS -> Z.sub
           | AST_MULTIPLY -> Z.mul
           | AST_DIVIDE -> Z.div
+          | AST_MODULO -> Z.erem
+
           )
           s1
           s2

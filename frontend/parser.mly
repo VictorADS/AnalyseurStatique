@@ -50,6 +50,7 @@ open Abstract_syntax_tree
 %token TOK_SEMICOLON
 %token TOK_COMMA
 %token TOK_EQUAL
+%token TOK_MODULO
 
 %token <string> TOK_id
 %token <string> TOK_int
@@ -61,7 +62,7 @@ open Abstract_syntax_tree
 %left TOK_AND_AND
 %left TOK_EXCLAIM
 %left TOK_PLUS TOK_MINUS
-%left TOK_STAR TOK_DIVIDE TOK_PERCENT
+%left TOK_STAR TOK_DIVIDE TOK_MODULO
 
 
 /* entry-point */
@@ -98,6 +99,7 @@ file: t=list(ext(stat)) TOK_EOF { t }
 | TOK_DIVIDE         { AST_DIVIDE }
 | TOK_PLUS           { AST_PLUS }
 | TOK_MINUS          { AST_MINUS }
+| TOK_MODULO	     { AST_MODULO }
 
 // comparison operators    
 %inline compare_op:
